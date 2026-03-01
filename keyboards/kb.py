@@ -13,7 +13,7 @@ class Keyboard:
                    InlineKeyboardButton(text="  Умножение на 7  ", callback_data="x7"),
                    InlineKeyboardButton(text="  Умножение на 8  ", callback_data="x8"),
                    InlineKeyboardButton(text="  Умножение на 9  ", callback_data="x9")]
-        
+    
 
     def multiplicate(self):
         kb_builder = InlineKeyboardBuilder()
@@ -22,7 +22,6 @@ class Keyboard:
         kb_builder.adjust(1)
 
         return kb_builder.as_markup()
-    
     
     
     def generate_multiplicate_answers(self, ans):

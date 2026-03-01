@@ -11,6 +11,7 @@ from math_examples.creating_examples import MultiplicationTable
 from states_floder.states import MultiplyState
 from database.db import DatabaseBot
 
+
 user_router = Router()
 table = MultiplicationTable()
 user_db = DatabaseBot()
@@ -27,11 +28,13 @@ async def start_bot(message: Message):
 
 @user_router.message(Command(commands="help"))
 async def help(message: Message):
-    await message.answer('''Чтобы попасть в главное меню, введите команду /start .\n
-Далее Вам нужно выбрать умножение на нужное число, нажав на соответствующую кнопку.\n
-После этого бот выведет Вам пример. Для ввода ответа нажмите на подходящую кнопку.\n
-Для вывода справки наберите команду /help .
-                        ''')
+    await message.answer('''📖 <b>Как пользоваться ботом</b>\n
+Основные разделы меню:\n
+🎓 <b>Тренировка</b> - Главный раздел. Выбирай конкретные числа и начинай решать примеры.\n
+📊 <b>Мой профиль</b> - Твоя личная статистика: количество решенных примеров, процент и количество правильных ответов.\n
+🏆 <b>Топ-5 легенд умножения</b> - Список лучших игроков. Решай примеры быстрее всех, чтобы попасть в зал славы и занять почетное место в пятерке лидеров!\n
+🆘 <b>Помощь</b> - Описание функций бота (вы находитесь здесь).\n
+<b>Совет:</b> чем регулярнее ты тренируешься, тем выше твоя позиция в глобальном рейтинге!''', parse_mode="HTML")
 
 
 @user_router.callback_query(F.data.startswith("x"))
@@ -46,7 +49,6 @@ async def mul_on_certain_num(callback: CallbackQuery, state: FSMContext):
     await state.update_data(user_id = callback.from_user.id, right_answer=ans)
 
     await callback.message.answer(text=f"{num1} * {num2} = ?", reply_markup=keyboard_with_answers)
-
 
 
 @user_router.message(MultiplyState.waiting_answer)
@@ -72,28 +74,24 @@ async def check_answer(message: Message, state: FSMContext):
 @user_router.message(Command(commands="top"))
 async def get_top_users(message: Message):
     top_users = await user_db.get_user_stats()
-    text = "🏆 Топ 5 игроков:\n\n"
+    text = "🏆 Топ 5 легенд умножения:\n\n"
     for i, (first_name, score) in enumerate(top_users, start=1):
         name = first_name
-        text += f"{i}. {name} — {score}\n"
+        text += f"{i}. {name} - {score} ✅\n"
 
     await message.answer(text)
+
 
 @user_router.message(Command(commands="profile"))
 async def view_profile(message: Message):
     profile = await user_db.get_profile_statistics(message.from_user.id)
     for row in profile:
         amount_solved_examples, amount_correctly_solved_examples, first_name = row
-    text = f"📊Ваш профиль:\n\n"
-    text += f"Решено примеров: {amount_solved_examples}\n"
-    text += f"Правильных решений: {amount_correctly_solved_examples}\n"
+    text = f"📊 Профиль: {first_name}\n\n"
+    text += f"💪 Решено примеров: {amount_solved_examples}\n"
+    text += f"✅ Верных ответов: {amount_correctly_solved_examples}\n"
     if amount_correctly_solved_examples != 0:
-        text += f"Процент верных решений: {round(amount_correctly_solved_examples / amount_solved_examples * 100)}%"
+        text += f"🎯 Точность: {round(amount_correctly_solved_examples / amount_solved_examples * 100)}%"
     else:
-         text += f"Процент верных решений: {0}%"
+         text += f"🎯 Точность: {0}%"
     await message.answer(text=text)
-
-    
-@user_router.message()
-async def reply_on_text_msg(message: Message):
-    await message.answer("Работа с ботом осуществляется только с помощью кнопок и команд /start , /help .")

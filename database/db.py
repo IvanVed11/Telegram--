@@ -4,6 +4,7 @@ class DatabaseBot:
     def __init__(self):
         self.db = None
 
+
     async def connect_with_database(self):
         if self.db is None:
             self.db = await aiosqlite.connect("database.db")
@@ -16,11 +17,12 @@ class DatabaseBot:
             ''')
             await self.db.commit()
 
+
     async def add_user(self, user_id, username, first_name):
         await self.db.execute('''INSERT OR IGNORE INTO Users
             (id, username, first_name, amount_correctly_solved_examples, amount_solved_examples)
             VALUES (?, ?, ?, 0, 0)''',
-        (user_id, username, first_name))
+            (user_id, username, first_name))
         await self.db.commit()
 
 
