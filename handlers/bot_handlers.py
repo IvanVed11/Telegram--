@@ -23,7 +23,7 @@ mul_table = defaultdict(int, {"1":[[1,1,1],[1,2,2],[1,3,3],[1,4,4],[1,5,5],[1,6,
 async def start_bot(message: Message):
     keyboard = kb_class.multiplicate()
     await user_db.add_user(message.from_user.id, message.from_user.username, message.from_user.first_name)
-    await message.answer(text="Привет! 🎓 С моей помощью ты выучишь таблицу умножения быстро и легко. Давай тренироваться.", reply_markup=keyboard)
+    await message.answer(text=f"Привет, {message.from_user.first_name}! 🎓 С моей помощью ты выучишь таблицу умножения быстро и легко. Давай тренироваться.", reply_markup=keyboard)
 
 
 @user_router.message(Command(commands="help"))
@@ -31,7 +31,7 @@ async def help(message: Message):
     await message.answer('''📖 <b>Как пользоваться ботом</b>\n
 Основные разделы меню:\n
 🎓 <b>Тренировка</b> - Главный раздел. Выбирай конкретные числа и начинай решать примеры.\n
-📊 <b>Мой профиль</b> - Твоя личная статистика: количество решенных примеров, процент и количество правильных ответов.\n
+📊 <b>Мои достижения</b> - Твоя личная статистика: количество решенных примеров, процент и количество правильных ответов.\n
 🏆 <b>Топ-5 легенд умножения</b> - Список лучших игроков. Решай примеры быстрее всех, чтобы попасть в зал славы и занять почетное место в пятерке лидеров!\n
 🆘 <b>Помощь</b> - Описание функций бота (вы находитесь здесь).\n
 <b>Совет:</b> чем регулярнее ты тренируешься, тем выше твоя позиция в глобальном рейтинге!''', parse_mode="HTML")
@@ -87,7 +87,7 @@ async def view_profile(message: Message):
     profile = await user_db.get_profile_statistics(message.from_user.id)
     for row in profile:
         amount_solved_examples, amount_correctly_solved_examples, first_name = row
-    text = f"📊 Профиль: {first_name}\n\n"
+    text = f"📊 {first_name}\n\n"
     text += f"💪 Решено примеров: {amount_solved_examples}\n"
     text += f"✅ Верных ответов: {amount_correctly_solved_examples}\n"
     if amount_correctly_solved_examples != 0:
