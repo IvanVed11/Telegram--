@@ -74,12 +74,17 @@ async def check_answer(message: Message, state: FSMContext):
 @user_router.message(Command(commands="top"))
 async def get_top_users(message: Message):
     top_users = await user_db.get_user_stats()
-    text = "🏆 Топ 5 легенд умножения:\n\n"
+    text = "🏆 <b>Топ 5 легенд умножения:</b>\n\n"
     for i, (first_name, score) in enumerate(top_users, start=1):
         name = first_name
         text += f"{i}. {name} - {score} ✅\n"
+    
+    place, correctly_solved_examples = await user_db.check_position_of_leaderboard(message.from_user.id)
+    text += f"\n\n📊 <b>Твой результат:</b>\n{correctly_solved_examples} ✅ ({place} место)\n"
 
-    await message.answer(text)
+    if place > 5:
+        text += "<i>Продолжай решать, чтобы попасть в топ!</i>"
+    await message.answer(text, parse_mode="HTML")
 
 
 @user_router.message(Command(commands="profile"))
@@ -91,7 +96,9 @@ async def view_profile(message: Message):
     text += f"💪 Решено примеров: {amount_solved_examples}\n"
     text += f"✅ Верных ответов: {amount_correctly_solved_examples}\n"
     if amount_correctly_solved_examples != 0:
-        text += f"🎯 Точность: {round(amount_correctly_solved_examples / amount_solved_examples * 100)}%"
+        text += f"🎯 Точность: {round(amount_correctly_solved_examples / amount_solved_examples * 100)}%\n"
     else:
-         text += f"🎯 Точность: {0}%"
+        text += f"🎯 Точность: {0}%\n"
+    place, correctly_solved_examples = await user_db.check_position_of_leaderboard(message.from_user.id)
+    text += f"🏆 Место в рейтинге: {place}"
     await message.answer(text=text)

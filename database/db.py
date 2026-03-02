@@ -50,7 +50,23 @@ class DatabaseBot:
         rows = await cursor.fetchall()
         return rows
 
+
+    async def get_statistics_of_all_users(self):
+        cursor = await self.db.execute('''SELECT id, 
+                                    first_name, amount_correctly_solved_examples 
+                                    FROM Users
+                                    ORDER BY amount_correctly_solved_examples DESC''')
+        return await cursor.fetchall()
+        
+
     
     async def close_connection(self):
         if self.db:
             await self.db.close()
+
+
+    async def check_position_of_leaderboard(self, user_id):
+        rows = await self.get_statistics_of_all_users()
+        user_statistics = [[place, row[1], row[2]] for place, row in enumerate(rows, start=1) if row[0] == user_id]
+        place, correctly_solved_examples = user_statistics[0][0], user_statistics[0][2]
+        return [place, correctly_solved_examples]
