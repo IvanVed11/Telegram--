@@ -1,21 +1,22 @@
 from random import randint
-import json
+from collections import Counter
 
-class MultiplicationTable:
-    def __init__(self):
-         with open("math_examples/multiplication_table.json", "r") as file:
-            self.table = json.load(file)
-        
+async def generate_examples_and_keyboards(factor, kb_class):
+    examples = []
+    keyboard_with_answers = []
+    counter = Counter()
 
-    def generate_examples(self):
-        examples = {}
-        for num1 in range(1, 10):
-            for num2 in range(1, 10):
-                examples.setdefault(num1, []).append([num1, num2, num1 * num2])
-        with open("math_examples/multiplication_table.json", "w") as my_file:
-            json.dump(examples, my_file, indent=2)
+    while len(examples) < 10:
+        num = randint(1, 9)
+        ans = factor * num
+        for example in examples:
+            if example[1] == num:
+                counter[num] += 1
+        if counter[num] < 2 and not examples: 
+            examples.append([factor, num, ans])
+            keyboard_with_answers.append(kb_class.generate_multiplicate_answers(ans))
+        elif counter[num] < 2 and examples and examples[-1][1] != num: 
+            examples.append([factor, num, ans])
+            keyboard_with_answers.append(kb_class.generate_multiplicate_answers(ans))
 
-
-    def get_examples(self, factor):
-        num1, num2, ans = self.table[str(factor)][randint(0, 8)]
-        return num1, num2, ans
+    return examples, keyboard_with_answers

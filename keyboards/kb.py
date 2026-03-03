@@ -5,6 +5,7 @@ from random import randint
 
 class Keyboard:
     def __init__(self):
+        self.cache = {}
         self.buttons = [InlineKeyboardButton(text="  Умножение на 2  ", callback_data="x2"),
                    InlineKeyboardButton(text="  Умножение на 3  ", callback_data="x3"),
                    InlineKeyboardButton(text="  Умножение на 4  ", callback_data="x4"),
@@ -25,6 +26,8 @@ class Keyboard:
     
     
     def generate_multiplicate_answers(self, ans):
+        if ans in self.cache:
+            return self.cache[ans]
         used_answers = {ans}
         while len(used_answers) < 12:
             used_answers.add(randint(0, ans + 10))
@@ -36,4 +39,5 @@ class Keyboard:
             resize_keyboard=True,
             one_time_keyboard=True
         )
+        self.cache[ans] = keyboard_with_answers
         return keyboard_with_answers
